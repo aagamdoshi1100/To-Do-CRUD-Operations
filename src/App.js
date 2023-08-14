@@ -1,72 +1,23 @@
 import "./App.css";
-import { useState } from "react";
+import { useToDoContext } from "./context/ToDoContext";
 
 export default function App() {
-  const [activity, setActivity] = useState({
-    myArray: [...JSON.parse(localStorage.getItem("Tasks"))],
-    mytext: "",
-    enableEdit: false,
-    indexofedit: "",
-    editVal: "",
-    myNewText: "",
-    readArray: [],
-  });
-  console.log(activity);
-  const unread = (item) => {
-    const removefromread = activity.readArray.filter(
-      (ele) => ele.value !== item.value
-    );
-    setActivity({ ...activity, readArray: removefromread });
-  };
-  const read = (item) => {
-    setActivity({ ...activity, readArray: [...activity.readArray, item] });
-  };
-  const addTask = () => {
-    const add = [
-      ...activity.myArray,
-      { id: activity.myArray.length, value: activity.mytext },
-    ];
-    setActivity({
-      ...activity,
-      myArray: add,
-      mytext: "",
-    });
-    localStorage.setItem("Tasks", JSON.stringify(add));
-  };
-  const removeItem = (itemId) => {
-    const filterData = JSON.parse(localStorage.getItem("Tasks"))?.filter(
-      (ele) => ele.id !== itemId
-    );
-    setActivity({ ...activity, myArray: filterData });
-    localStorage.setItem("Tasks", JSON.stringify(filterData));
-  };
-  const edit = (item, ii) => {
-    setActivity({
-      ...activity,
-      enableEdit: true,
-      indexofedit: ii,
-      myNewText: item.value,
-    });
-  };
-  const update = (id) => {
-    const editedData = activity.myArray.map((ele) => {
-      if (id === ele.id) {
-        return { ...ele, value: activity.myNewText };
-      }
-      return ele;
-    });
-    setActivity({
-      ...activity,
-      enableEdit: false,
-      myNewText: "",
-      myArray: editedData,
-    });
-    localStorage.setItem("Tasks", JSON.stringify(editedData));
-  };
-
+  const {
+    update,
+    edit,
+    addTask,
+    unread,
+    removeItem,
+    read,
+    activity,
+    setActivity,
+  } = useToDoContext();
   return (
     <div className="App">
-      <h3>CRUD Operations</h3>
+      <div className="header">
+        <h3>To Do App</h3>
+        <p>CRUD Operations</p>
+      </div>
       <div className="boxes add">
         <input
           type="text"
@@ -114,12 +65,12 @@ export default function App() {
               </p>
             )}
             <div className="boxes">
-              <div className="b1" onClick={() => removeItem(item.id)}>
+              <div className="b1" onClick={() => removeItem(item)}>
                 Delete
               </div>
 
               {activity.enableEdit && activity.indexofedit === index ? (
-                <div className="b1" onClick={() => update(item.id)}>
+                <div className="b1" onClick={() => update(item)}>
                   Update
                 </div>
               ) : (
@@ -134,7 +85,7 @@ export default function App() {
                 </div>
               ) : (
                 <div className="b1" onClick={() => read(item)}>
-                  Mark as read
+                  Read
                 </div>
               )}
             </div>
